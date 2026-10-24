@@ -74,17 +74,38 @@ def validate_cutoff(cutoff_str: str) -> str:
     return cutoff_str
 
 
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     logger.info("Initializing database...")
+#     init_db()
+#     meta = get_metadata_info()
+#     logger.info(
+#         f"Database initialized. Records: {meta['actuals_count']} actuals, "
+#         f"{meta['forecasts_count']} forecasts."
+#     )
+#     yield
+#     logger.info("Application shutting down.")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Initializing database...")
+
     init_db()
     meta = get_metadata_info()
-    logger.info(
-        f"Database initialized. Records: {meta['actuals_count']} actuals, "
-        f"{meta['forecasts_count']} forecasts."
-    )
+
+    logger.info("Database metadata: %s", meta)
+
+    if meta["actuals_count"] == 0 or meta["forecasts_count"] == 0:
+        logger.warning(
+            "Database has missing data: actuals=%s, forecasts=%s",
+            meta["actuals_count"],
+            meta["forecasts_count"],
+        )
+
     yield
     logger.info("Application shutting down.")
+
 
 
 app = FastAPI(
