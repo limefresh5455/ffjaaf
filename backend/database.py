@@ -1,13 +1,37 @@
 import os
 import sqlite3
 import shutil
+import logging
+
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 
+logger = logging.getLogger(__name__)
+
+
 PROJECT_DB_PATH = Path(__file__).resolve().parent / "elexon_data.db"
 VERCEL_DB_PATH = Path("/tmp/elexon_data.db")
-    
+
+def prepare_database():
+    """Prepare the bundled SQLite database for Vercel."""
+    if os.environ.get("VERCEL") == "1":
+        if not PROJECT_DB_PATH.is_file():
+            raise FileNotFoundError(
+                f"Bundled database is missing: {PROJECT_DB_PATH}"
+            )
+
+        VERCEL_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+        # Copy the populated database before opening any connections.
+        shutil.copy2(PROJECT_DB_PATH, VERCEL_DB_PATH)
+
+        logger.info(
+            "Database copied: source_size=%s, target_size=%s",
+            PROJECT_DB_PATH.stat().st_size,
+            VERCEL_DB_PATH.stat().st_size,
+        )
+        
 
 def get_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
     path = db_path or os.environ.get("DATABASE_PATH", DEFAULT_DB_PATH)
