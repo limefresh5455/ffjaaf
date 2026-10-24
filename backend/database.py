@@ -10,8 +10,7 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 
-PROJECT_DB_PATH = Path(__file__).resolve().parent / "elexon_data.db"
-VERCEL_DB_PATH = Path("/tmp/elexon_data.db")
+DEFAULT_DB_PATH = os.path.join(os.path.dirname(__file__), "elexon_data.db")
 
 def prepare_database():
     """Prepare the bundled SQLite database for Vercel."""
