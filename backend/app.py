@@ -9,6 +9,7 @@ from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import (
+prepare_database
     init_db,
     get_actuals_series,
     get_day_ahead_forecasts_series,
@@ -89,19 +90,18 @@ def validate_cutoff(cutoff_str: str) -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    logger.info("Preparing database...")
+    prepare_database()
+
     logger.info("Initializing database...")
-
     init_db()
+
     meta = get_metadata_info()
-
-    logger.info("Database metadata: %s", meta)
-
-    if meta["actuals_count"] == 0 or meta["forecasts_count"] == 0:
-        logger.warning(
-            "Database has missing data: actuals=%s, forecasts=%s",
-            meta["actuals_count"],
-            meta["forecasts_count"],
-        )
+    logger.info(
+        "Database ready: %s actuals, %s forecasts",
+        meta["actuals_count"],
+        meta["forecasts_count"],
+    )
 
     yield
     logger.info("Application shutting down.")
