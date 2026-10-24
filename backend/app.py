@@ -9,7 +9,6 @@ from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import (
-prepare_database
     init_db,
     get_actuals_series,
     get_day_ahead_forecasts_series,
@@ -37,13 +36,6 @@ DEFAULT_DATE_TO = "2026-02-01"
 # EPEX SPOT GB Day-Ahead order book gate closure is 09:20 UK time (Nord Pool is 09:50 UK time)
 DEFAULT_CUTOFF_TIME = "09:20:00"
 
-
-app = FastAPI(
-    title="UK Wind Day-Ahead Procurement Intelligence API",
-    description="Elexon BMRS Wind Generation Forecast & Accuracy Analytics",
-    version="1.0.0",
-    lifespan=lifespan,
-)
 
 def resolve_str(val: Any, default: Optional[str] = None) -> Optional[str]:
     """Helper enabling direct Python invocation of route functions in unit tests."""
@@ -82,37 +74,17 @@ def validate_cutoff(cutoff_str: str) -> str:
     return cutoff_str
 
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     logger.info("Initializing database...")
-#     init_db()
-#     meta = get_metadata_info()
-#     logger.info(
-#         f"Database initialized. Records: {meta['actuals_count']} actuals, "
-#         f"{meta['forecasts_count']} forecasts."
-#     )
-#     yield
-#     logger.info("Application shutting down.")
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Preparing database...")
-    prepare_database()
-
     logger.info("Initializing database...")
     init_db()
-
     meta = get_metadata_info()
     logger.info(
-        "Database ready: %s actuals, %s forecasts",
-        meta["actuals_count"],
-        meta["forecasts_count"],
+        f"Database initialized. Records: {meta['actuals_count']} actuals, "
+        f"{meta['forecasts_count']} forecasts."
     )
-
     yield
     logger.info("Application shutting down.")
-
 
 
 app = FastAPI(
