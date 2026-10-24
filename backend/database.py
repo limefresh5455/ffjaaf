@@ -3,8 +3,18 @@ import os
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 
-DEFAULT_DB_PATH = os.path.join(os.path.dirname(__file__), "elexon_data.db")
+# DEFAULT_DB_PATH = os.path.join(os.path.dirname(__file__), "elexon_data.db")
 
+
+# Use writable temporary storage on Vercel.
+# Keep the database beside the source code when running locally.
+if os.environ.get("VERCEL") == "1":
+    DEFAULT_DB_PATH = "/tmp/elexon_data.db"
+else:
+    DEFAULT_DB_PATH = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "elexon_data.db"
+    )
 
 def get_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
     path = db_path or os.environ.get("DATABASE_PATH", DEFAULT_DB_PATH)
