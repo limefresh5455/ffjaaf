@@ -38,6 +38,13 @@ DEFAULT_DATE_TO = "2026-02-01"
 DEFAULT_CUTOFF_TIME = "09:20:00"
 
 
+app = FastAPI(
+    title="UK Wind Day-Ahead Procurement Intelligence API",
+    description="Elexon BMRS Wind Generation Forecast & Accuracy Analytics",
+    version="1.0.0",
+    lifespan=lifespan,
+)
+
 def resolve_str(val: Any, default: Optional[str] = None) -> Optional[str]:
     """Helper enabling direct Python invocation of route functions in unit tests."""
     return val if isinstance(val, str) else default
