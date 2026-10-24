@@ -1,31 +1,12 @@
-import sqlite3
 import os
+import sqlite3
+import shutil
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-from pathlib import Path
 
-# DEFAULT_DB_PATH = os.path.join(os.path.dirname(__file__), "elexon_data.db")
-
-
-# Use writable temporary storage on Vercel.
-# Keep the database beside the source code when running locally.
-# if os.environ.get("VERCEL") == "1":
-#     DEFAULT_DB_PATH = "/tmp/elexon_data.db"
-# else:
-#     DEFAULT_DB_PATH = os.path.join(
-#         os.path.dirname(os.path.abspath(__file__)),
-#         "elexon_data.db"
-#     )
-# DEFAULT_DB_PATH = Path(__file__).resolve().parent / "elexon_data.db"
-# Path to the database file included in your project.
 PROJECT_DB_PATH = Path(__file__).resolve().parent / "elexon_data.db"
-
-# Vercel's filesystem is read-only except for /tmp.
-# Locally, use the existing project database.
-if os.environ.get("VERCEL") == "1":
-    DEFAULT_DB_PATH = Path("/tmp/elexon_data.db")
-else:
-    DEFAULT_DB_PATH = PROJECT_DB_PATH
+VERCEL_DB_PATH = Path("/tmp/elexon_data.db")
     
 
 def get_connection(db_path: Optional[str] = None) -> sqlite3.Connection:
